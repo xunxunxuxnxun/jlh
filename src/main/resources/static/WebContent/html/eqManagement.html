@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>管理平台</title>
+		<link rel="stylesheet" type="text/css" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+		<script src="../source/jquery/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+	</head>
+	<body>
+		<!--导航-->
+		<nav class="navbar navbar-default">
+		    <div class="container-fluid">
+		        <!--小屏幕导航按钮和Logo-->
+		        <div class="navbar-header">
+		            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		            <a href="../index.html" class="navbar-brand">九里湖湿地生态环境监测平台</a>
+		        </div>
+		        <!--小屏幕导航按钮和Logo-->
+		        <!--导航-->
+		        <div class="navbar-collapse collapse">
+		            <ul class="nav navbar-nav">
+                		<li class="active">
+                			<a href="../html/detectionOnTime.html#updataData">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;实时监测
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/warning.html#dLabel">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;实时数据
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/history.html#table">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;历史数据
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/alarmList.html#alarmType">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;预警警报
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/map.html#allmap">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;监测点
+                			</a>
+                		</li>
+		            </ul>
+		
+		            <ul class="nav navbar-nav navbar-right">
+		                <li class="dropdown">
+		                    <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		                        <!-- ${loginList.username } --> admin
+		                        <span class="caret"></span>
+		                    </a>
+		                    <ul class="dropdown-menu" aria-labelledby="dLabel">
+		                        <li>
+		                        	<a href="../index.html">
+		                        		<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;前台首页
+		                        	</a>
+		                        </li>
+		                        <li>
+		                        <a href="javascript:void(0);">
+                                	<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;用户注册
+                                </a>
+                        		</li>
+		                    </ul>
+		                </li>
+		                <li>
+		                	<a href="../index.html"><span class="glyphicon glyphicon-off">
+		                		</span>&nbsp;&nbsp;退出
+		                	</a>
+		                </li>
+		            </ul>
+		        </div>
+		    </div>
+		</nav>
+		
+		<div class="col-md-12">
+			<div>
+		    	<ol class="breadcrumb">
+  					<li><a href="<%=path %>/back/index.jsp">管理端主页</a></li>
+  					<li class="active">站点</li>
+				</ol>
+		    </div>
+		    
+		    <ul class="nav nav-tabs">
+		    	<li class="active"><a href="javascript:void(0);">监测设备列表</a></li>
+		    	<li><a href="<%=path %>/back/map.jsp">监测设备位置地图</a></li>
+		    	
+		    </ul>
+		</div>
+		<div class="col-md-12">
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">新增站点</button>
+		</div>
+		<div class="col-md-12" >
+			<div class="col-md-12 bg-info text-left"  style="height:40px;line-height:40px;font-size:18px">
+				<span>监测设备列表</span>
+			</div>
+			<div class="col-md-12" style="border:1px solid #c4e3f3">
+				<div class="panel-body">
+	                <table class="table table-bordered" id="datatable">
+	                 <thead>
+ 						<tr>
+ 							<td>站点名称</td>
+ 							<td>设备编号</td>
+ 							<td>设备类型</td>
+ 							<td>责任人</td>
+ 							<td>添加时间</td>
+ 							<td>责任电话</td>
+ 							<td>说明</td>
+ 							<td>经度(GPS)</td>
+ 							<td>纬度(GPS)</td>
+ 						</tr>
+ 					</thead>
+ 					<tbody id="tbody">
+ 					
+ 					</tbody>
+				</table>
+				<!-- 提示分页信息行 -->
+                    <div class="row">
+                        <!-- 分页文字信息 ：拿到控制器处理请求时封装在pageInfo里面的分页信息-->
+                        <div class="col-sm-5" id="page_info_area">
+                            <div class="dataTables_info" id="dataTableExample_info" style="margin-left: 20px">
+								
+								
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <!-- 分页码 -->
+                            <div class="dataTables_paginate paging_simple_numbers" id="dataTableExample_paginate" style="line-height: 32.4px">
+								
+                            </div>
+                        </div>
+                    </div>
+	            </div>
+			</div>
+		</div>
+
+	
+		<div class="modal fade " id="myModal" tabindex="-1" role="dialog">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">新增站点</h4>
+			  </div>
+			  <div class="modal-body">
+				<form  class="form-horizontal" role="form">
+				  <div class="form-group" >
+					<label for="name" class="col-sm-2 control-label">设备类型</label>
+					<div class="col-sm-10">
+						<select class="form-control" id="equipmentType">
+						  <option value="1">气象站</option>
+						  <option value="2">空气质量监测站</option>
+						  <option value="3">水文水质监测站</option>
+						  <option value="4">土壤监测站</option>
+						</select>
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">站点编号</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="siteId">
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">设备编号</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="equipmentNumber">
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">经度(GPS)</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="longitude">
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">纬度(GPS)</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="latitude">
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">责任人</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="createUser">
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">责任电话</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="phoneNumber">
+					</div>
+				  </div>
+				  <div class="form-group">
+					<label for="name" class="col-sm-2 control-label">说明</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="message">
+					</div>
+				  </div>
+				</form>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" onclick="save()" data-dismiss="modal">保存</button>
+			  </div>
+			</div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
+	</body>
+</html>
+<script type="text/javascript">
+	function save(){
+		debugger;
+		var param = new Object();
+		param.equipmentType = $("#equipmentType").val();
+		param.siteId = $("#siteId").val();
+		param.equipmentNumber = $("#equipmentNumber").val();
+		param.longitude = $("#longitude").val();
+		param.latitude = $("#latitude").val();
+		param.createUser = $("#createUser").val();
+		param.phoneNumber = $("#phoneNumber").val();
+		param.message = $("#message").val();
+		var reqparam = JSON.stringify(param);
+		$.ajax({
+			type:"post",
+			url:"/jlh/addEquipment.action",
+			dataType:"json",
+			async:true,
+			data:reqparam,
+			contentType: 'application/json',
+			success: function(data){
+				debugger;
+				alert(data.returnMsg);
+				location.reload();
+			 }
+		})
+	}
+	
+	//查询设备列表
+	var param = new Object();
+	param.pageNum = 1;
+	var eq = JSON.stringify(param);
+	$.ajax({
+		url:'/jlh/getEquipmentList',
+		type:'post',
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:eq,
+		success:function(data,status){
+			if(data.returnCode==200){
+				display(data);
+				build_pagination_info(data);
+				build_pagination_nav(data);
+			}
+			if(data.returnCode==400){
+				alert("未查询到数据");
+			}
+		},
+		error: function(){  
+                  alert("服务器没有返回数据，可能服务器忙，请重试");  
+              }
+	});
+	//数据展示
+    function display(data){
+    $("#tbody").empty();
+    	var obj = JSON.parse(data.returnObj);
+    	var list = obj.list;
+    	debugger;
+    	var tbody = document.getElementById("tbody");
+    	for(var i=0;i<list.length;i++){
+    		var tr = "<tr>"+
+    		"<td>"+list[i].siteNO+"</td>"+
+    		"<td>"+list[i].equipmentNO+"</td>"+
+    		"<td>"+list[i].equipmentType+"</td>"+
+    		"<td>"+list[i].createUser+"</td>"+
+    		"<td>"+list[i].createTime+"</td>"+
+    		"<td>"+list[i].phoneNumber+"</td>"+
+    		"<td>"+list[i].message+"</td>"+
+    		"<td>"+list[i].longitude+"</td>"+
+    		"<td>"+list[i].latitude+"</td>"+"</tr>";
+    		$("#tbody").append(tr);
+    	}
+    }
+  //ajax请求后台
+    function ajaxPost(param){
+    	$.ajax({
+			url:'/jlh/getEquipmentList',
+			type:'post',
+			dataType: 'json',
+			contentType: 'application/json', 
+			data:param,
+			success:function(data,status){
+				if(data.returnCode==200){
+					display(data);
+					build_pagination_info(data);
+					build_pagination_nav(data);
+				}
+				if(data.returnCode==400){
+					alert("未查询到历史数据");
+				}
+			},
+			error: function(){  
+                alert("服务器没有返回数据，可能服务器忙，请重试");  
+            }
+		});
+    }
+    /**
+    创建分页信息
+    */
+   function build_pagination_info(result) {
+       $("#dataTableExample_info").empty();
+       var equipmentObj = JSON.parse(result.returnObj);
+		
+       //得到服务器返回的jason数据里的分页信息，然后拼接
+		
+       var pageNum = equipmentObj.pageNum;
+       var pageSize = equipmentObj.pages;
+       var total = equipmentObj.total;
+		
+       //"当前"+pageNum+"页,共"+pages+"页,总"+total+"条记录"
+       // $("#dataTableExample_info").append("第"+ pageNum+ "至"+ pageSize+" 项，共"+ total+" 项");
+       $("#dataTableExample_info").append("当前" + pageNum + "页,共" + pageSize + "页,总" + total + "条记录")
+   }
+	
+   /**
+    创建分页导航条：
+    根据bootstrap文档里的分页说明，使用jquery创建元素。
+    */
+   function build_pagination_nav(result) {
+	   var equipmentObj = JSON.parse(result.returnObj);
+       $("#dataTableExample_paginate").empty();
+       //首页
+       var fristPageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append("首页"));
+       //前一页
+       var prePageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append($("<span></span>").append("&laquo;")));
+       //如果没有前一页，就让按钮不能被点击,否则绑定点击事件，重新发送ajax请求，访问相应页面
+       if (equipmentObj.hasPreviousPage == false) {
+           fristPageLi.addClass("disable");
+           prePageLi.addClass("disable");
+       }
+       else {
+           fristPageLi.click(function () {
+               var param = new Object();
+	    		/* param.beginTime = document.getElementById("beginTime").value;
+	    		param.endTime = document.getElementById("endTime").value; */
+	    		param.pageNum = 1;
+	    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+           });
+           prePageLi.click(function () {
+               var param = new Object();
+	    		/* param.beginTime = document.getElementById("beginTime").value;
+	    		param.endTime = document.getElementById("endTime").value; */
+	    		param.pageNum = equipmentObj.pageNum - 1;
+	    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+           });
+       }
+       var ul = $("<ul class=\"pagination\" style=\"float: right\"></ul>").addClass("pagination").append(fristPageLi).append(prePageLi);
+       $.each(equipmentObj.navigatepageNums, function (index, element) {
+           var numLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append(element));
+           //如果遍历的页码等于当前页面，就高亮显示，然后添加点击事件，如果有点击，就重新发送ajax请求，访问当前页面（pn=element）
+           if (equipmentObj.pageNum == element) {
+               numLi.addClass("active");
+           }
+           numLi.click(function () {
+               var param = new Object();
+	    		/* param.beginTime = document.getElementById("beginTime").value;
+	    		param.endTime = document.getElementById("endTime").value; */
+	    		param.pageNum = element;
+	    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+           })
+           ul.append(numLi);
+       })
+       //下一页
+       var nextPageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append($("<span></span>").append("&raquo;")));
+       //末页
+       var lastPageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append("末页"));
+       //如果没有后一页，就让按钮不能被点击,否则绑定点击事件，重新发送ajax请求，访问相应页面
+       if (equipmentObj.hasNextPage == false) {
+           nextPageLi.addClass("disable");
+           lastPageLi.addClass("disable");
+       }
+       else {
+           nextPageLi.click(function () {
+               var param = new Object();
+	    		param.pageNum = equipmentObj.pageNum + 1;
+	    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+           });
+           lastPageLi.click(function () {
+               var param = new Object();
+	    		param.pageNum = equipmentObj.pages;
+	    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+           });
+       }
+       ul.append(nextPageLi).append(lastPageLi);
+       $("<nav></nav>").append(ul).appendTo("#dataTableExample_paginate");
+   }
+</script>

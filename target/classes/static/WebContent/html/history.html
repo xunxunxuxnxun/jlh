@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>历史数据</title>
+		<!-- bootstrap相关 -->
+		<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap-maizi.css" />
+		<link href="../source/datetime/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+
+		<script src="../source/jquery/jquery-3.1.1.min.js"></script>
+		<script src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+		<script src="../source/bootstrap-3.3.7-dist/js/Chart.js"></script>
+		<script src="../source/bootstrap-3.3.7-dist/js/script.js"></script>
+		<script src="../js/localPath.js"></script>
+		<script src="../js/public.js"></script>
+	</head>
+
+	<body>
+		<!--导航-->
+		<nav class="navbar navbar-default">
+		    <div class="container-fluid">
+		        <!--小屏幕导航按钮和Logo-->
+		        <div class="navbar-header">
+		            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		            <a href="../index.html" class="navbar-brand">九里湖湿地生态环境监测平台</a>
+		        </div>
+		        <!--小屏幕导航按钮和Logo-->
+		        <!--导航-->
+		        <div class="navbar-collapse collapse">
+		            <ul class="nav navbar-nav">
+                		<li class="active">
+                			<a href="../html/detectionOnTime.html#updataData">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;实时监测
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/warning.html#dLabel">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;实时数据
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/history.html#table">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;历史数据
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/alarmList.html#alarmType">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;预警警报
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/map.html#allmap">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;监测点
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/idi.html">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;动物识别
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/zhiwu.html">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;植物识别
+                			</a>
+                		</li>
+		            </ul>
+		
+		            <ul class="nav navbar-nav navbar-right">
+		                <li class="dropdown">
+		                    <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		                        <!-- ${loginList.username } --> admin
+		                        <span class="caret"></span>
+		                    </a>
+		                    <ul class="dropdown-menu" aria-labelledby="dLabel">
+		                        <li>
+		                        	<a href="../index.html">
+		                        		<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;前台首页
+		                        	</a>
+		                        </li>
+		                        <li>
+		                        <a href="javascript:void(0);">
+                                	<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;用户注册
+                                </a>
+                        		</li>
+		                    </ul>
+		                </li>
+		                <li>
+		                	<a href="../index.html"><span class="glyphicon glyphicon-off">
+		                		</span>&nbsp;&nbsp;退出
+		                	</a>
+		                </li>
+		            </ul>
+		        </div>
+		    </div>
+		</nav>
+
+		<div class="col-md-12">
+			<ul class="nav nav-tabs">
+				<li onclick="ajaxSearch(1)"><button type="button" class="btn btn-info" style="float:left;margin-left:10px;">气象站</button></li>
+				<li onclick="ajaxSearch(2)"><button type="button" class="btn btn-info" style="float:left;margin-left:10px;">水文水质监测站</button></li>
+				<li onclick="ajaxSearch(3)"><button type="button" class="btn btn-info" style="float:left;margin-left:10px;">土壤监测站</button></li>
+				<li onclick="ajaxSearch(4)"><button type="button" class="btn btn-info" style="float:left;margin-left:10px;">空气质量监测站</button></li>
+			</ul>
+		</div>
+		<!-- 存放数据的div -->
+		<div id="table">
+		
+		</div>
+		<script type="text/javascript" src="../source/datetime/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+    	<script type="text/javascript" src="../source/datetime/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
+    	<script type="text/javascript" src="../source/datetime/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+	
+		<script type="text/javascript">
+			$('.form_date').datetimepicker({
+			format:'yyyy-mm-dd',
+	        language:  'zh-CN',
+	        weekStart: 1,
+	        todayBtn:  1,
+			autoclose: 1,
+			todayHighlight: 1,
+			startView: 2,
+			minView: 2,
+			forceParse: 0,
+	    });
+	    
+	    function ajaxSearch(station){
+	    	debugger;
+    	if(station==1){
+	    	var path1 = "../html/weatherHistoryWithTime.html";
+	    	$("#table").load(path1);
+//	    	var url = localAddr+"/jlh/queryWeatherHistory";
+	    	//queryHistory(url);
+    	}
+    	if(station==2){
+	    	var path2 = "../html/waterHistoryWithTime.html";
+	    	$("#table").load(path2);
+    	}
+    	if(station==3){
+	    	var path3 = "../html/soilHistoryWithTime.html";
+	    	$("#table").load(path3);
+    	}
+    	if(station==4){
+	    	var path4 = "../html/airHistoryWithTime.html";
+	    	$("#table").load(path4);
+    	}
+    	
+    }
+		</script>
+	</body>
+
+</html>

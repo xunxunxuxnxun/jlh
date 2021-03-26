@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!-- bootstrap相关 -->
+		<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+	    <link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap-maizi.css"/>
+	    <link href="../source/datetime/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+	    
+	    <script src="../source/jquery/jquery-3.1.1.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/Chart.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/script.js"></script>
+	    <script src="../js/localPath.js"></script>
+	    <script type="text/javascript" src="../source/sheet/xlsx.core.min.js"></script>
+	</head>
+	<body>
+		<div class="row">
+    	<div class="col-md-12">
+			<div class="panel panel-default plain toggle panelClose panelRefresh">
+	            <!-- Start .panel -->
+	            <div class="panel-heading white-bg">
+	            	<div class="row">
+					<div class="col-lg-4">
+						<div id="startDiv" class="input-group date width100">
+							  <input id="beginTime"
+								  name="start" class="form-control" type="text"
+								  value="" placeholder="请选择开始日期" readonly="readonly"> <span
+								  class="input-group-addon"> <span
+								  class="glyphicon glyphicon-remove"></span>
+							  </span> <span class="input-group-addon"> <span
+								  class="glyphicon glyphicon-calendar"></span>
+							  </span>
+						 </div>
+					</div>
+					<div class="col-lg-4">
+						<div id="endDiv" class="input-group date width100">
+						  <input id="endTime"
+							  name="start" class="form-control" type="text"
+							  value="" placeholder="请选择结束日期" readonly="readonly"> <span
+							  class="input-group-addon"> <span
+							  class="glyphicon glyphicon-remove"></span>
+						  </span> <span class="input-group-addon"> <span
+							  class="glyphicon glyphicon-calendar"></span>
+						  </span>
+						 </div>
+					</div>
+					
+					<div class="col-lg-4">
+						<button id="search" type="button" class="btn btn-primary" onclick="queryHistory()">搜索</button>&emsp;&emsp;&emsp;
+						<button id="day" type="button" class="btn btn-primary btn-sm" onclick="downloadHour()">导出小时数据</button>
+						<button id="hour" type="button" class="btn btn-primary btn-sm" onclick="downloadDay()">导出日数据</button>
+						<button id="month" type="button" class="btn btn-primary btn-sm" onclick="downloadMonth()">导出月数据</button>
+					</div>
+					</div>
+	            </div>
+	            
+	            <div class="panel-body">
+	                <table class="table table-bordered" id="datatable">
+	                	<thead>
+	                		<tr>
+ 							<td>风速</td>
+ 							<td>风向</td>
+ 							<td>温度</td>
+ 							<td>湿度</td>
+ 							<td>噪声</td>
+ 							<td>气压</td>
+ 							<td>光照</td>
+ 							<td>雨量</td>
+ 							<td>监测时间</td>
+ 							<td>设备编号</td>
+ 						</tr>
+	                	</thead>
+	                 	<tbody id="tbody">
+	                 	
+	                 	</tbody>
+					</table>
+					
+					<!-- 提示分页信息行 -->
+                    <div class="row">
+                        <!-- 分页文字信息 ：拿到控制器处理请求时封装在pageInfo里面的分页信息-->
+                        <div class="col-sm-5" id="page_info_area">
+                            <div class="dataTables_info" id="dataTableExample_info" style="margin-left: 20px">
+								
+								
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <!-- 分页码 -->
+                            <div class="dataTables_paginate paging_simple_numbers" id="dataTableExample_paginate" style="line-height: 32.4px">
+								
+                            </div>
+                        </div>
+                    </div>
+					
+	            </div>
+	        </div>
+		</div>
+	</div>
+	
+    <script type="text/javascript" src="../source/datetime/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="../source/datetime/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+    <script type="text/javascript">
+	    $("#startDiv").datetimepicker({
+          pickerPosition : "bottom-left",
+          language : 'zh-CN',
+          format : "yyyy-mm-dd hh:ii:ss",
+          weekStart : 1,
+          todayBtn : 1,
+          autoclose : 1,
+          todayHighlight : 1,
+          startView : 2,
+          minView : 2,
+          forceParse : 0
+      });
+	  
+	  $("#endDiv").datetimepicker({
+          pickerPosition : "bottom-left",
+          language : 'zh-CN',
+          format : "yyyy-mm-dd HH:ii:ss",
+          weekStart : 1,
+          todayBtn : 1,
+          autoclose : 1,
+          todayHighlight : 1,
+          startView : 2,
+          minView : 2,
+          forceParse : 0
+      });
+	    
+	    //查询历史数据
+		function queryHistory(){
+			
+    		var param = new Object();
+    		param.beginTime = document.getElementById("beginTime").value;
+    		param.endTime = document.getElementById("endTime").value;
+    		param.pageNum = 1;
+    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+    		debugger;
+    		ajaxPost(paramString);
+	    		
+	    }
+	    //ajax请求后台
+	    function ajaxPost(param){
+	    	$.ajax({
+				url:"/jlh/queryWeatherHistory",
+				type:'post',
+				dataType: 'json',
+				contentType: 'application/json', 
+				data:param,
+				success:function(data,status){
+					debugger;
+					if(data.returnCode==200){
+						display(data);
+						build_pagination_info(data);
+						build_pagination_nav(data);
+					}
+					if(data.returnCode==400){
+						alert("未查询到历史数据");
+					}
+					
+				},
+				error: function(){  
+                    alert("服务器没有返回数据，可能服务器忙，请重试");  
+                }
+			});
+	    }
+	    //数据展示
+	    function display(data){
+	    $("#tbody").empty();
+	    	var list = data.returnObj.list;
+	    	var tbody = document.getElementById("tbody");
+	    	for(var i=0;i<list.length;i++){
+	    		var tr = "<tr>"+"<td>"+list[i].windSpeed+"</td>"+
+	    		"<td>"+list[i].windDirection+"</td>"+
+	    		"<td>"+list[i].temperature+"</td>"+
+	    		"<td>"+list[i].humidity+"</td>"+
+	    		"<td>"+list[i].noise+"</td>"+
+	    		"<td>"+list[i].gasPressure+"</td>"+
+	    		"<td>"+list[i].beam+"</td>"+
+	    		"<td>"+list[i].rainfall+"</td>"+
+	    		"<td>"+list[i].longDate+"</td>"+
+	    		"<td>"+list[i].equipmentNO+"</td>"+"</tr>";
+	    		$("#tbody").append(tr);
+	    	}
+	    }
+	    
+/*	   	function display(data){
+	    	$("#tbody").empty();
+	    	var list = data.returnObj.list;
+	    	var tbody = "";
+	    	
+	    	$.each(list, function (index, item) {
+	    		tbody+ = "<tr>"+"<td>"+item.windSpeed+"</td>";
+	    		tbody+ = "<td>"+item.windDirection+"</td>";
+	    		tbody+ = "<td>"+item.temperature+"</td>";
+	    		tbody+ = "<td>"+item.humidity+"</td>";
+	    		tbody+ = "<td>"+item.noise+"</td>";
+	    		tbody+ = "<td>"+item.gasPressure+"</td>";
+	    		tbody+ = "<td>"+item.beam+"</td>";
+	    		tbody+ = "<td>"+item.rainfall+"</td>";
+	    		tbody+ = "<td>"+item.longDate+"</td>";
+	    		tbody+ = "<td>"+item.equipmentNO+"</td>"+"</tr>";
+	    		
+	    	});
+	    	$("#tbody").html(tbody);
+	    }*/
+			
+		/**
+         创建分页信息
+         */
+        function build_pagination_info(result) {
+            $("#dataTableExample_info").empty();
+			
+            //得到服务器返回的jason数据里的分页信息，然后拼接
+			
+            var pageNum = result.returnObj.pageNum;
+            var pageSize = result.returnObj.pages;
+            var total = result.returnObj.total;
+			
+            //"当前"+pageNum+"页,共"+pages+"页,总"+total+"条记录"
+            // $("#dataTableExample_info").append("第"+ pageNum+ "至"+ pageSize+" 项，共"+ total+" 项");
+            $("#dataTableExample_info").append("当前" + pageNum + "页,共" + pageSize + "页,总" + total + "条记录")
+        }
+		
+        /**
+         创建分页导航条：
+         根据bootstrap文档里的分页说明，使用jquery创建元素。
+         */
+        function build_pagination_nav(result) {
+            $("#dataTableExample_paginate").empty();
+            //首页
+            var fristPageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append("首页"));
+            //前一页
+            var prePageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append($("<span></span>").append("&laquo;")));
+            //如果没有前一页，就让按钮不能被点击,否则绑定点击事件，重新发送ajax请求，访问相应页面
+            if (result.returnObj.hasPreviousPage == false) {
+                fristPageLi.addClass("disable");
+                prePageLi.addClass("disable");
+            }
+            else {
+                fristPageLi.click(function () {
+                    var param = new Object();
+		    		param.beginTime = document.getElementById("beginTime").value;
+		    		param.endTime = document.getElementById("endTime").value;
+		    		param.pageNum = 1;
+		    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+    				ajaxPost(paramString);
+                });
+                prePageLi.click(function () {
+                    var param = new Object();
+		    		param.beginTime = document.getElementById("beginTime").value;
+		    		param.endTime = document.getElementById("endTime").value;
+		    		param.pageNum = result.returnObj.pageNum - 1;
+		    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+    				ajaxPost(paramString);
+                });
+            }
+            var ul = $("<ul class=\"pagination\" style=\"float: right\"></ul>").addClass("pagination").append(fristPageLi).append(prePageLi);
+            $.each(result.returnObj.navigatepageNums, function (index, element) {
+                var numLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append(element));
+                //如果遍历的页码等于当前页面，就高亮显示，然后添加点击事件，如果有点击，就重新发送ajax请求，访问当前页面（pn=element）
+                if (result.returnObj.pageNum == element) {
+                    numLi.addClass("active");
+                }
+                numLi.click(function () {
+                    var param = new Object();
+		    		param.beginTime = document.getElementById("beginTime").value;
+		    		param.endTime = document.getElementById("endTime").value;
+		    		param.pageNum = element;
+		    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+    				ajaxPost(paramString);
+                })
+                ul.append(numLi);
+            })
+            //下一页
+            var nextPageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append($("<span></span>").append("&raquo;")));
+            //末页
+            var lastPageLi = $("<li></li>").append($("<a></a>").attr("href", "javacript:void(0);").append("末页"));
+            //如果没有后一页，就让按钮不能被点击,否则绑定点击事件，重新发送ajax请求，访问相应页面
+            if (result.returnObj.hasNextPage == false) {
+                nextPageLi.addClass("disable");
+                lastPageLi.addClass("disable");
+            }
+            else {
+                nextPageLi.click(function () {
+                    var param = new Object();
+		    		param.beginTime = document.getElementById("beginTime").value;
+		    		param.endTime = document.getElementById("endTime").value;
+		    		param.pageNum = result.returnObj.pageNum + 1;
+		    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+    				ajaxPost(paramString);
+                });
+                lastPageLi.click(function () {
+                    var param = new Object();
+		    		param.beginTime = document.getElementById("beginTime").value;
+		    		param.endTime = document.getElementById("endTime").value;
+		    		param.pageNum = result.returnObj.pages;
+		    		var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+    				ajaxPost(paramString);
+                });
+            }
+            ul.append(nextPageLi).append(lastPageLi);
+            $("<nav></nav>").append(ul).appendTo("#dataTableExample_paginate");
+        }	
+			
+	function downloadDay(){
+    	var url = '/jlh/exportWeatherByDay';
+    	var str = "气象站日数据.xlsx";
+    	download(url,str);
+    }
+    function downloadHour(){
+    	var url = '/jlh/exportWeatherByHour';
+    	var str = "气象站小时数据.xlsx";
+    	download(url,str);
+    }
+    function downloadMonth(){
+    	var url = '/jlh/exportWeatherByMonth';
+    	var str = "气象站那月数据.xlsx";
+    	download(url,str);
+    }
+    function download(url,str) {
+//		var url = localAddr+'/jlh/exportAirByDay';
+		var beginTime = document.getElementById("beginTime").value;
+    	var endTime = document.getElementById("endTime").value;
+    	var form = new FormData();
+        form.append("beginTime",beginTime);
+        form.append("endTime",endTime);
+		var xhr = new XMLHttpRequest();
+		xhr.open('post', url, true);
+		xhr.responseType = 'blob';
+		xhr.onload = function(e) {
+			if(xhr.status == 200) {
+				var blob = this.response;
+				
+				if(window.navigator.msSaveBlob){
+	                window.navigator.msSaveBlob(blob, str);
+	            }else{
+		                var downloadUrl = window.URL.createObjectURL(blob);
+		                var anchor = document.createElement('a');
+		                anchor.href = downloadUrl;
+		                anchor.download = str;
+		//              anchor.click();
+		//              alert("下载成功!");
+						var event;
+						if(window.MouseEvent) event = new MouseEvent('click');
+						else
+						{
+							event = document.createEvent('MouseEvents');
+							event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+						}
+						anchor.dispatchEvent(event);
+			        }
+				}
+			};
+		xhr.send(form);
+	}		
+			
+    </script>
+	</body>
+</html>

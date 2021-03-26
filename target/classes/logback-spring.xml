@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 获取application配置文件中的配置-->
+    <springProperty scope="context" name="logLevel" source="log.level"/>
+    <springProperty scope="context" name="logPath" source="log.path"/>
+
+    <!-- 日志输出格式 -->
+    <property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+    <!-- 日志文件前缀 -->
+    <property name="LOG_FILE_PREF" value="app" />
+
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE-INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${LOG_FILE_PREF}_info.log</file>
+        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>info</level>
+        </filter>-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${LOG_FILE_PREF}_info.%d{yyyy-MM-dd}.zip
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE-DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${LOG_FILE_PREF}_debug.log</file>
+        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logPath}/${LOG_FILE_PREF}_debug.%d{yyyy-MM-dd}.zip
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logPath}/${LOG_FILE_PREF}_error.log</file>
+    <!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+         <level>error</level>
+     </filter>-->
+     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+         <fileNamePattern>${logPath}/${LOG_FILE_PREF}_error.%d{yyyy-MM-dd}.zip
+         </fileNamePattern>
+         <maxHistory>30</maxHistory>
+     </rollingPolicy>
+     <encoder>
+         <charset>UTF-8</charset>
+         <pattern>${PATTERN}</pattern>
+     </encoder>
+ </appender>
+
+<!--优先级从高到低依次为：OFF、FATAL、ERROR、WARN、INFO、DEBUG、TRACE、 ALL-->
+    <root level="${logLevel}">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE-INFO" />
+        <appender-ref ref="FILE-DEBUG" />
+        <appender-ref ref="FILE-ERROR" />
+    </root>
+</configuration>

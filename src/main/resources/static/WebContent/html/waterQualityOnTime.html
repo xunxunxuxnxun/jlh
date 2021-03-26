@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>实时数据</title>
+		<!-- echarts相关 -->
+		<script charset="utf-8" type="text/javascript" src="../source/echarts/echarts-all.js" ></script>
+		
+		<!-- bootstrap相关 -->
+		<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+	    <link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap-maizi.css"/>
+	    <script src="../source/jquery/jquery-3.1.1.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/Chart.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/script.js"></script>
+	    <script src="../js/localPath.js"></script>
+	</head>
+	<body>
+		<div class="col-md-12"  style="margin-top:5px">
+   		<div class="col-md-12 bg-info text-left"  style="height:40px;line-height:40px;font-size:18px">
+			<span id="eqno">实时数据：设备编号：</span>
+		</div>
+		<div class="col-md-12 panel panel-default" >
+			<div>
+				<input id="wld" class="form-control input-lg" type="text" " readonly="readonly">
+			</div>
+			<div class="transparencyl-md-12" style="margin-top:5px">
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>水位</p>
+					<p id="ww"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>溶解氧</p>
+					<p id="wd"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>温度</p>
+					<p id="wt"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>氧化还原电位</p>
+					<p id="wo"> </p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>电导率</p>
+					<p id="wc"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>PH值</p>
+					<p id="wp"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>透明度</p>
+					<p id="wts"> </p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>流速</p>
+					<p id="wf"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>NH4</p>
+					<p id="wn"> </p>
+				</div>
+			</div>
+		</div>
+   </div>
+   
+   <div class="col-md-12" style="margin-top:10px">
+   		<div class="col-md-12 bg-info text-left"  style="height:40px;line-height:40px;font-size:18px">
+			<label>
+				<input type="checkbox"/>24小时变化曲线
+			</label>
+		</div>
+		<div class="col-md-12" style="border:1px solid #c4e3f3">
+			<div id="waterLevel" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="dissolvedOXY" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="temperature" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="oxidationReductionPotential" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="transparencynductivity" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="ph" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="transparency" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="flowRate" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="nh4" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+		</div>
+		
+   </div>
+	</body>
+</html>
+<script type="text/javascript">
+	var url1="/jlh/getWaterOne";
+   	//头部数据
+   	$.ajax({
+		url:url1,
+		type:'post',
+		async:false,
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:'',
+		success:function(data,status){
+		if(data.returnCode==200){
+			if(data.returnObj!=null){
+				reloadOne(data.returnObj);
+			}
+		}
+		},
+		error: function(){  
+            alert("服务器没有返回数据，可能服务器忙，请重试");  
+        }
+	});
+   	function reloadOne(data){
+   		$("#eqno").append(data.equipmentNO);
+   		$("#wld").attr("placeholder","监测时间："+data.longDate);
+   		$("#ww").append(data.waterLevel+"m/s");
+   		$("#wd").append(data.dissolvedOXY+"mg/L");
+   		$("#wt").append(data.temperature+"摄氏度");
+   		$("#wo").append(data.oxidationReductionPotential+"ug/m3");
+   		$("#wc").append(data.conductivity+"us/cm");
+   		$("#wp").append(data.ph);
+   		$("#wts").append(data.transparency);
+   		$("#wf").append(data.flowRate);
+   		$("#wn").append(data.nh4);
+   		
+   	}
+   	
+   	//表格数据
+   	var data=new Array();
+   	var ww=new Array();
+   	var wd=new Array();
+   	var wt=new Array();
+   	var wo=new Array();
+   	var wc=new Array();
+   	var wp=new Array();
+   	var wts=new Array();
+   	var wf=new Array();
+   	var wn=new Array();
+   	var url="/jlh/waterQualityOnTime";
+   	var param = new Object();
+   	param.equipmentNO="00030001";
+   	var paramStr = JSON.stringify(param);
+   	$.ajax({
+		url:url,
+		type:'post',
+		async:false,
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:paramStr,
+		success:function(data,status){
+		if(data.returnCode==200){
+			if(data.returnObj!=null){
+				reload(data.returnObj);
+			}
+		}
+		},
+		error: function(){  
+            alert("服务器没有返回数据，可能服务器忙，请重试");  
+        }
+	});
+	
+   	function reload(list){
+   		for (var i=0;i<list.length;i++) {
+   			data.push(list[i].longDate);
+   			ww.push(list[i].waterLevel);
+   			wd.push(list[i].dissolvedOXY);
+   			wt.push(list[i].temperature);
+   			wo.push(list[i].oxidationReductionPotential);
+   			wc.push(list[i].conductivity);
+   			wp.push(list[i].ph);
+   			wts.push(list[i].transparency);
+   			wf.push(list[i].flowRate);
+   			wn.push(list[i].nh4);
+   		}
+   	}
+   	
+   		//水位
+	var windSpeed = echarts.init(document.getElementById('waterLevel'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '水位-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['水位']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'水位',
+	            type:'line',
+	            data:ww
+	        }
+	    ]
+	});
+	
+	//温度
+	var windSpeed = echarts.init(document.getElementById('temperature'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '温度-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['温度']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+//	            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+//	            	'1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'温度',
+	            type:'line',
+	            data:wt
+	        }
+	    ]
+	});
+	
+		//溶解氧
+	var windSpeed = echarts.init(document.getElementById('dissolvedOXY'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '溶解氧-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['溶解氧']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'溶解氧',
+	            type:'line',
+	            data:wd
+	        }
+	    ]
+	});
+	
+		//氧化还原电位
+	var windSpeed = echarts.init(document.getElementById('oxidationReductionPotential'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '氧化还原电位-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['氧化还原电位']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'氧化还原电位',
+	            type:'line',
+	            data:wo
+	        }
+	    ]
+	});
+	
+		//电导率
+	var windSpeed = echarts.init(document.getElementById('transparencynductivity'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '电导率-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['电导率']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'电导率',
+	            type:'line',
+	            data:wc
+	        }
+	    ]
+	});
+	
+		//PH
+	var windSpeed = echarts.init(document.getElementById('ph'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'ph-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['ph']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'ph',
+	            type:'line',
+	            data:wp
+	        }
+	    ]
+	});
+	
+		//透明度
+	var windSpeed = echarts.init(document.getElementById('transparency'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '透明度-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['透明度']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'透明度',
+	            type:'line',
+	            data:wts
+	        }
+	    ]
+	});
+			//流速
+	var windSpeed = echarts.init(document.getElementById('flowRate'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '流速-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['流速']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'流速',
+	            type:'line',
+	            data:wf
+	        }
+	    ]
+	});
+			//NH4
+	var windSpeed = echarts.init(document.getElementById('nh4'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'NH4-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['NH4']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'NH4',
+	            type:'line',
+	            data:wn
+	        }
+	    ]
+	});
+   </script>

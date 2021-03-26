@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!-- bootstrap相关 -->
+		<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+	    <link rel="stylesheet" href="../js/bootstrap-3.3.7-dist/css/bootstrap-maizi.css"/>
+	    <script src="../source/jquery/jquery-3.1.1.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/Chart.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/script.js"></script>
+	    <script src="../js/localPath.js"></script>
+	    <script src="../js/public.js"></script>
+	</head>
+	<script type="text/javascript">
+		$.ajax({
+			type : "POST",
+			url : "D://resource/oy/os.py",
+			data : {},
+			success : callbackFunc
+		});
+	</script>
+	<body>
+		<!--导航-->
+		<nav class="navbar navbar-default">
+		    <div class="container-fluid">
+		        <!--小屏幕导航按钮和Logo-->
+		        <div class="navbar-header">
+		            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		            <a href="../index.html" class="navbar-brand">九里湖湿地生态环境监测平台</a>
+		        </div>
+		        <!--小屏幕导航按钮和Logo-->
+		        <!--导航-->
+		        <div class="navbar-collapse collapse">
+		            <ul class="nav navbar-nav">
+                		<li class="active">
+                			<a href="../html/detectionOnTime.html#updataData">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;实时监测
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/warning.html#dLabel">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;实时数据
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/history.html#table">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;历史数据
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/alarmList.html#alarmType">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;预警警报
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/map.html#allmap">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;监测点
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/idi.html">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;动物识别
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/zhiwu.html">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;植物识别
+                			</a>
+                		</li>
+		            </ul>
+		
+		            <ul class="nav navbar-nav navbar-right">
+		                <li class="dropdown">
+		                    <a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		                        <!-- ${loginList.username } --> admin
+		                        <span class="caret"></span>
+		                    </a>
+		                    <ul class="dropdown-menu" aria-labelledby="dLabel">
+		                        <li>
+		                        	<a href="../index.html">
+		                        		<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;前台首页
+		                        	</a>
+		                        </li>
+		                        <li>
+		                        <a href="javascript:void(0);">
+                                	<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;用户注册
+                                </a>
+                        		</li>
+		                    </ul>
+		                </li>
+		                <li>
+		                	<a href="../index.html"><span class="glyphicon glyphicon-off">
+		                		</span>&nbsp;&nbsp;退出
+		                	</a>
+		                </li>
+		            </ul>
+		        </div>
+		    </div>
+		</nav>
+		
+		<div class="col-md-12">
+			<div>
+		    	<ol class="breadcrumb">
+  					<li><a href="../index.html">主页</a></li>
+  					<li class="active">实时监控</li>
+				</ol>
+		    </div>
+		    <ul class="nav nav-tabs">
+		    	<li class="active"><a href="javascript:void(0);">监测设备列表</a></li>
+		    	<li><a href="../html/map.html">监测设备位置地图</a></li>
+		    	<li id="updataData" class="navbar-right">数据更新时间：<%= (new java.util.Date()).toLocaleString()%></li>
+		    </ul>
+		</div>
+		<div class="col-md-12">
+			<c:set var="onlineCount" value="0"></c:set>
+			<c:forEach items="${equipmentsList}" var="u">
+				<c:if test="${u.onlineOrNot == 1}" var = "在线">
+					<c:set var="onlineCount" value="${onlineCount+1}"></c:set>
+				</c:if>
+			</c:forEach>
+			<p>
+			当前共有设备<span id="currenteq" class="label label-primary"></span>
+			台，其中在线：<span id="online" class="label label-primary"></span>
+			台，离线：<span id="outline" class="label label-primary"></span>
+			台，在线率：<span id="onout" class="label label-primary"></span>
+			</p>
+		</div>
+		<div class="col-md-12" >
+			<div class="col-md-12 bg-info text-left"  style="height:40px;line-height:40px;font-size:18px">
+				<span>监测设备列表</span>
+			</div>
+			<div id="display" class="col-md-12" style="border:1px solid #c4e3f3">
+				
+			</div>
+		</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	var url="/jlh/EquipmentInfo";
+	var param;
+	$.ajax({
+		url:url,
+		type:'post',
+		async:false,
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:param,
+		success:function(data,status){
+		if(data.returnCode==200){
+			if(data.returnObj!=null){
+			display(data.returnObj);
+		}
+	}
+		},
+		error: function(){  
+            alert("服务器没有返回数据，可能服务器忙，请重试");  
+        }
+	});
+	
+	function display(list){
+		var online=0;
+		for (var i=0;i<list.length;i++) {
+			if(list[i].onlineOrNot==1){
+				online++;
+			}
+			var href = "javascript:void(0);";
+			if(list[i].typeId==1){
+				href="../html/weatherOnTime.html";
+			}else if(list[i].typeId==2){
+				href="../html/airQualityOnTime.html";
+			}else if(list[i].typeId==3){
+				href="../html/waterQualityOnTime.html";
+			}else if(list[i].typeId==4){
+				href="../html/soilOnTime.html";
+			}
+			
+			var tr="<div class='col-md-4 bs-example' style='margin-top:5px'>"+
+			"<table class='table' style='border:2px solid #c4e3f3'>"+
+			"<tr>"+
+			"<td>站点编号：</td><td>"+list[i].siteNO+"</td>"+
+			"<td><a class= 'btn btn-default btn-primary btn-sm active' href="+href+
+			" role='button'>在线</a></td></tr>"+
+			"<tr><td>设备编号：</td><td>"+list[i].equipmentNO +"</td><td></td>"+
+			"</tr><tr><td>设备类型：</td><td>"+list[i].equipmentType+"</td><td></td></tr>"+
+			"<tr><td style ='color:blue'>预警&nbsp;&nbsp;"+
+			"<a href='javascript:void(0);'><span class='label label-info'>"+list[i].warning+"</span></a>"+
+			"</td><td style = 'color:blue'>警报&nbsp;&nbsp;"+
+			"<a href='javascript:void(0);'><span class='label label-warning'>"+list[i].alarm+"</span></a>"+
+			"</td><td style = 'color:blue'>异常&nbsp;&nbsp;"+
+			"<a href='javascript:void(0);'><span class='label label-danger'>"+list[i].error+"</span></a></td></tr></table></div>";
+			
+			$("#display").append(tr);
+		}
+		
+		$("#currenteq").append(list.length);
+		$("#online").append(online);
+		$("#outline").append(list.length-online);
+		$("#onout").append(online/list.length*100+"%");
+	}
+</script>

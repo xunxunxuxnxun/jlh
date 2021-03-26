@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>实时数据</title>
+		<!--<link rel="stylesheet" type="text/css" href="DetectionOnTime.css">-->
+		<!-- echarts相关 -->
+		<script charset="utf-8" type="text/javascript" src="../source/echarts/echarts-all.js" ></script>
+		
+		<!-- bootstrap相关 -->
+		<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+	    <link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap-maizi.css"/>
+	    <script src="../source/jquery/jquery-3.1.1.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/Chart.js"></script>
+	    <script src="../source/bootstrap-3.3.7-dist/js/script.js"></script>
+	    <script src="../js/localPath.js"></script>
+	</head>
+	<body>
+   <div class="col-md-12"  style="margin-top:5px">
+   		<div class="col-md-12 bg-info text-left"  style="height:40px;line-height:40px;font-size:18px">
+			<span id="eqno">实时数据：设备编号：</span>
+		</div>
+		<div class="col-md-12 panel panel-default" >
+			<div>
+				<input id="ald" class="form-control input-lg" type="text"  readonly="readonly"></input>
+			</div>
+			<div class="col-md-12" style="margin-top:5px">
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>风速</p>
+					<p id="aws"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>风向</p>
+					<p id="awd"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>PM 2.5</p>
+					<p id="apm25"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>PM 10</p>
+					<p id="apm10"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>温度</p>
+					<p id="at"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>湿度</p>
+					<p id="ah"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>O3</p>
+					<p id="ao3"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>CO</p>
+					<p id="aco"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>SO2</p>
+					<p id="aso2"></p>
+				</div>
+				<div class="col-md-2" style="background-color:#FAF0E6;margin:5px">
+					<p>NO2</p>
+					<p id="ano2"></p>
+				</div>
+			</div>
+		</div>
+   </div>
+   
+   <div class="col-md-12" style="margin-top:10px">
+   		<div class="col-md-12 bg-info text-left"  style="height:40px;line-height:40px;font-size:18px">
+			<label>
+				<input type="checkbox"/>24小时变化曲线
+			</label>
+		</div>
+		<div class="col-md-12" style="border:1px solid #c4e3f3">
+			<div id="windSpeed" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="temperature" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="humidity" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="pm25" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="pm10" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="o3" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="co" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="so2" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+			<div id="no2" class="col-md-6" style="width:600px;height:400px;padding:5px;"></div>
+		</div>
+		
+   </div>
+
+	</body>
+</html>
+   <script type = "text/javascript">
+   var url1="/jlh/getAirOne";
+   	//头部数据
+   	$.ajax({
+		url:url1,
+		type:'post',
+		async:false,
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:'',
+		success:function(data,status){
+		if(data.returnCode==200){
+			if(data.returnObj!=null){
+				reloadOne(data.returnObj);
+			}
+		}
+		},
+		error: function(){  
+            alert("服务器没有返回数据，可能服务器忙，请重试");  
+        }
+	});
+   	function reloadOne(data){
+   		$("#eqno").append(data.equipmentNO);
+   		$("#ald").attr("placeholder","监测时间："+data.longDate);
+   		$("#aws").append(data.windSpeed+"m/s");
+   		$("#awd").append(data.windDirection);
+   		$("#apm25").append(data.pm25+"ug/m3");
+   		$("#apm10").append(data.pm10+"ug/m3");
+   		$("#at").append(data.temperature+"摄氏度");
+   		$("#ah").append(data.humidity+"%RH");
+   		$("#ao3").append(data.o3+"ppm");
+   		$("#aco").append(data.co+"ppm");
+   		$("#aso2").append(data.so2+"ppm");
+   		$("#ano2").append(data.no2+"ppm");
+   	}
+   	//表格数据
+   	var data=new Array();
+   	var windSpeedO=new Array();
+   	var temperatureO=new Array();
+   	var humidityO=new Array();
+   	var pm25O=new Array();
+   	var pm10O=new Array();
+   	var o3O=new Array();
+   	var coO=new Array();
+   	var so2O=new Array();
+   	var no2O=new Array();
+   	var url="/jlh/airQualityOnTime";
+   	var param = new Object();
+   	param.equipmentNO="00020001";
+   	var paramStr = JSON.stringify(param);
+   	$.ajax({
+		url:url,
+		type:'post',
+		async:false,
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:paramStr,
+		success:function(data,status){
+		if(data.returnCode==200){
+			if(data.returnObj!=null){
+				reload(data.returnObj);
+			}
+		}
+		},
+		error: function(){  
+            alert("服务器没有返回数据，可能服务器忙，请重试");  
+        }
+	});
+	
+   	function reload(list){
+   		for (var i=0;i<list.length;i++) {
+   			data.push(list[i].longDate);
+   			windSpeedO.push(list[i].windSpeed);
+   			temperatureO.push(list[i].temperature);
+   			humidityO.push(list[i].humidity);
+   			pm25O.push(list[i].pm25);
+   			pm10O.push(list[i].pm10);
+   			o3O.push(list[i].o3);
+   			coO.push(list[i].co);
+   			so2O.push(list[i].so2);
+   			no2O.push(list[i].no2);
+   		}
+   	}
+   	
+   	debugger;
+	//风速
+	var windSpeed = echarts.init(document.getElementById('windSpeed'),{
+		noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '风速-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['风速']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'风速',
+	            type:'line',
+	            data:windSpeedO
+	        }
+	    ]
+	});
+	
+	//温度
+	var windSpeed = echarts.init(document.getElementById('temperature'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '温度-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['温度']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+//	            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+//	            	'1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'温度',
+	            type:'line',
+	            data:temperatureO
+	        }
+	    ]
+	});
+	
+		//湿度
+	var windSpeed = echarts.init(document.getElementById('humidity'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: '湿度-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['湿度']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'湿度',
+	            type:'line',
+	            data:humidityO
+	        }
+	    ]
+	});
+	
+		//PM2.5
+	var windSpeed = echarts.init(document.getElementById('pm25'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'PM2.5-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['PM2.5']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'PM2.5',
+	            type:'line',
+	            data:pm25O
+	        }
+	    ]
+	});
+	
+		//PM10
+	var windSpeed = echarts.init(document.getElementById('pm10'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'PM10-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['PM10']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'PM10',
+	            type:'line',
+	            data:pm10O
+	        }
+	    ]
+	});
+	
+		//O3
+	var windSpeed = echarts.init(document.getElementById('o3'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'O3-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['O3']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'O3',
+	            type:'line',
+	            data:o3O
+	        }
+	    ]
+	});
+	
+		//CO
+	var windSpeed = echarts.init(document.getElementById('co'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'CO-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['CO']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+//	            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+//	            	'1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'CO',
+	            type:'line',
+	            data:coO
+	        }
+	    ]
+	});
+			//SO2
+	var windSpeed = echarts.init(document.getElementById('so2'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'SO2-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['SO2']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+//	            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+//	            	'1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'SO2',
+	            type:'line',
+	            data:so2O
+	        }
+	    ]
+	});
+			//NO2
+	var windSpeed = echarts.init(document.getElementById('no2'),{
+                noDataLoadingOption :{
+                    text: '暂无数据',
+                    effect:'bubble',
+                    effectOption : {
+                        effect: {
+                            n: 0 //气泡个数为0 
+                        }
+                    },
+                    textStyle: {
+                        fontSize: 32,
+                        fontWeight: 'bold'
+                    }
+                }
+            });
+
+	windSpeed.setOption({
+		title : {
+	        text: 'NO2-24小时变化曲线图',
+	        
+	    },
+	    tooltip : {
+	        trigger: 'axis'
+	    },
+	    legend: {
+	        data:['NO2']
+	    },
+	    toolbox: {
+	        show : true,
+	        feature : {
+	            mark : {show: true},
+	            dataView : {show: true, readOnly: false},
+	            magicType : {show: true, type: ['line', 'bar']},
+	            restore : {show: true},
+	            saveAsImage : {show: true}
+	        }
+	    },
+	    calculable : true,
+	    xAxis : [
+	        {
+	            type : 'category',
+	            data :data
+	        }
+	    ],
+	    yAxis : [
+	        {
+	            type : 'value',
+	            splitArea : {show : true}
+	        }
+	    ],
+	    series : [
+	       
+	        {
+	            name:'NO2',
+	            type:'line',
+	            data:no2O
+	        }
+	    ]
+	});
+   </script>

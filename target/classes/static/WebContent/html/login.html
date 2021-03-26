@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="http://translate.demo.yusure.cn/admin/css/login.css" />
+  <style>
+  body{height:100%;background:#333333;overflow:hidden;}
+  canvas{z-index:-1;position:absolute;}
+  </style>
+</head>
+<body>
+<form role="form" method="get" id="addForm" enctype="multipart/form-data">
+  <input type="hidden" name="_token" value="BilblmC87TZjz5riSUIFzW7ayQ8IP7QQUqBeAtUk">
+  <dl class="admin_login">
+    <dt>
+    <strong>九里湖湿地生态环境监测系统</strong>
+    <em>Jiuli Lake Wetland Ecological environment monitoring system</em>
+    </dt>
+    <dd class="user_icon">
+    <input type="text" placeholder="用户名" name="username" class="login_txtbx " id = "username"/>
+        </dd>
+    <dd class="pwd_icon">
+    <input type="password" placeholder="密码" name="password" class="login_txtbx" id = "password"/>
+        </dd>
+    <dd>
+    <input type="button" value="登录" onclick="login()" class="submit_btn"/>
+    </dd>
+    <dd>
+    <input type="button" value="注册" onclick="location.href='UserAdd.html'" class="submit_btn"/>
+    </dd>
+
+  </dl>
+</form>
+  <script src="http://translate.demo.yusure.cn/vendors/jquery/jquery-2.1.1.js"></script>
+  <script src="http://translate.demo.yusure.cn/vendors/Particleground.js"></script>
+  <script>
+  $(document).ready(function() {
+  //粒子背景特效
+  $('body').particleground({
+  dotColor: '#505050',
+  lineColor: '#505050'
+  });
+  });
+  </script>
+</body>
+</html>
+<script type="text/javascript" language="javascript">
+function login(){
+    var param = new Object();
+	param.username = $("#username").val();
+	param.password = $("#password").val();
+	param = JSON.stringify(param);
+	$.ajax({
+		url:"/jlh/login.action",
+		type:'post',
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:param,
+		success:function(data,status){
+			if(data.returnMsg=="failed"){
+				location.reload();
+			}
+			window.location.href="../html/index.html"
+			},
+		error: function(){  
+            alert("服务器没有返回数据，可能服务器忙，请重试");  
+        }
+	}); 
+}
+</script>

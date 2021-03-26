@@ -1,0 +1,199 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>九里湖湿地生态监测平台</title>
+<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="../source/bootstrap-3.3.7-dist/css/bootstrap-maizi.css"/>
+<script type="text/javascript" src="../source/jquery/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="//api.map.baidu.com/api?v=2.0&ak=wzmFtNbeO6zGrdoRP7TTFRudGE3kd2Ya"></script>
+<style type="text/css">
+body, html, #allmap,#title {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	margin: 0;
+	font-family: "微软雅黑";
+}
+
+.table-b table {
+	border: 1px solid black;
+	margin-top: 10px;
+	width: 220px;	
+}
+
+.table-a {
+	border: 1px
+}
+.title{
+	font-size:50px;
+	background-color:#F5F5F5;
+	height: 100px;
+	line-height:100px;
+}
+.div{
+display:inline
+}
+</style>
+</head>
+<body>
+	<div class="title">
+		九里湖湿地生态环境监测平台
+		<a href="../html/alarmList.html#alarmType" class="btn btn-warning btn-lg active" role="button">预警/警告</a>
+		<a href="../html/history.html#table" class="btn btn-default btn-lg active" role="button">数据查询</a>
+		
+	</div>
+	<div id="allmap"></div>
+	
+	<script src="../js/localPath.js"></script>
+	<script type="text/javascript">
+	
+	var url = "/jlh/queryAllPoint";
+	$.ajax({
+		url : url,
+		type : 'post',
+		dataType : 'json',
+		contentType : 'application/json',
+		success : function(data, status) {
+			if (data.returnCode == 200) {
+				showPoint(data.returnObj);
+			}
+			if (data.returnCode == 400) {
+				alert("未查询到历史数据");
+			}
+		},
+		error : function() {
+			alert("服务器没有返回数据，可能服务器忙，请重试");
+		}
+	});
+	
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");
+	var point = new BMap.Point(116.404, 39.915);
+	map.centerAndZoom(point, 20);
+	var marker = new BMap.Marker(point);
+
+	map.setCurrentCity("北京"); // 设置地图显示的城市 此项是必须设置的
+	map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+	
+	var opts = {
+		      width: 0,
+		      height: 0,
+		      title: "<h style='color:grey'>"+'设备微型监测'+"</h>" 
+		    }
+	//地图类型
+	var mapType = new BMap.MapTypeControl(
+			{
+				mapTypes: [BMAP_NORMAL_MAP,BMAP_HYBRID_MAP],
+				anchor: BMAP_ANCHOR_TOP_LEFT
+			}
+		);
+	map.addControl(mapType);//2D图，混合图
+	function showPoint(mapList){
+		for (var i = 0; i < mapList.length; i++) {
+			//转成对象
+			var equipment = mapList[i];
+			var x = mapList[i].longitude;
+			var y = mapList[i].latitude;
+			var data = mapList[i].data;
+			var icon = new BMap.Icon('../img/ico/se.svg', new BMap.Size(50,
+					50));
+			icon.setImageSize(new BMap.Size(50,
+					50))
+			var sContent="";
+			if(mapList[i].typeId=='1'){
+				sContent ="<div>"
+				+ "<table><tr><th>监测点：</th><td>"+mapList[i].equipmentType+"</td></tr><tr>"
+				+ "<th>设备编号：</th><td>"+mapList[i].equipmentNO+"</td></tr>"
+				+ "<tr><th>数据状态：</th><td>"+mapList[i].errorFlagName+"</td></tr>"
+				+ "<tr><th>电池电压：</th><td>"+"10v"+"</td></tr></table>"
+				+ "<div  class='table-b' id='tableId-b'>"
+				+ "<table  border='0' cellspacing='0' cellpadding='0'>"
+				+ "<tr><td>温度：</td><td>"+data.temperature+"  摄氏度"+"</td></tr>"
+				+ "<tr><td>湿度：</td><td>"+data.humidity+"  %RH"+"</td></tr>"
+				+ "<tr><td>噪声：</td><td>"+data.noise+"  dB"+"</td></tr>"
+				+ "<tr><td>气压：</td><td>"+data.gasPressure+"  Kpa"+"</td></tr>"
+				+ "<tr><td>光照：</td><td>"+data.beam+"  Lux"+"</td></tr>"
+				+ "<tr><td>雨量：</td><td>"+data.rainfall+"  mm"+"</td></tr>"
+				+ "<tr><td>风速：</td><td>"+data.windSpeed+"  m/s"+"</td></tr>"
+				+ "<tr><td>风向：</td><td>"+data.windDirection+"</td></tr></table>" + "</div>"
+				+ "</div>"; 
+			}else if(mapList[i].typeId=='2'){
+				sContent ="<div>"
+				+ "<table><tr><th>监测点：</th><td>"+mapList[i].equipmentType+"</td></tr><tr>"
+				+ "<th>设备编号：</th><td>"+mapList[i].equipmentNO+"</td></tr>"
+				+ "<tr><th>数据状态：</th><td>"+mapList[i].errorFlagName+"</td></tr>"
+				+ "<tr><th>电池电压：</th><td>"+"10v"+"</td></tr></table>"
+				+ "<div  class='table-b' id='tableId-b'>"
+				+ "<table  border='0' cellspacing='0' cellpadding='0'>"
+				+ "<tr><td>SO2：</td><td>"+data.so2+"  ppm"+"</td></tr>"
+				+ "<tr><td>NO2：</td><td>"+data.no2+"  ppm"+"</td></tr>"
+				+ "<tr><td>PM10：</td><td>"+data.pm10+"  ug/m3"+"</td></tr>"
+				+ "<tr><td>PM2.5：</td><td>"+data.pm25+"  ug/m3"+"</td></tr>"
+				+ "<tr><td>O3：</td><td>"+data.o3+"  ppm"+"</td></tr>"
+				+ "<tr><td>CO：</td><td>"+data.co+"  ppm"+"</td></tr>"
+				+ "<tr><td>温度：</td><td>"+data.temperature+"  摄氏度"+"</td></tr>"
+				+ "<tr><td>湿度：</td><td>"+data.humidity+"  %RH"+"</td></tr>"
+				+ "<tr><td>风速：</td><td>"+data.windSpeed+"  m/s"+"</td></tr>"
+				+ "<tr><td>风向：</td><td>"+data.windDirection+"</td></tr></table>" + "</div>"
+				+ "</div>"; 
+			}else if(mapList[i].typeId=='3'){
+				sContent ="<div>"
+				+ "<table><tr><th>监测点：</th><td>"+mapList[i].equipmentType+"</td></tr><tr>"
+				+ "<th>设备编号：</th><td>"+mapList[i].equipmentNO+"</td></tr>"
+				+ "<tr><th>数据状态：</th><td>"+mapList[i].errorFlagName+"</td></tr>"
+				+ "<tr><th>电池电压：</th><td>"+"10v"+"</td></tr></table>"
+				+ "<div  class='table-b'  id='tableId-b'>"
+				+ "<table  border='0' cellspacing='0' cellpadding='0'>"
+				+ "<tr><td>水位：</td><td>"+data.waterLevel+"  m/s"+"</td></tr>"
+				+ "<tr><td>溶解氧：</td><td>"+data.dissolvedOXY+"  mg/L"+"</td></tr>"
+				+ "<tr><td>温度：</td><td>"+data.temperature+"摄氏度"+"</td></tr>"
+				+ "<tr><td>氧化还原电位：</td><td>"+data.oxidationReductionPotential+"</td></tr>"
+				+ "<tr><td>电导率：</td><td>"+data.conductivity+"  us/cm"+"</td></tr>"
+				+ "<tr><td>PH值：</td><td>"+data.ph+"</td></tr>"
+				+ "<tr><td>透明度：</td><td>"+data.transparency+"</td></tr>"
+				+ "<tr><td>流速：</td><td>"+data.flowRate+"</td></tr>"
+				+ "<tr><td>NH4：</td><td>"+data.nh4+"</td></tr></table>" + "</div>"
+				+ "</div>"; 
+			}else if(mapList[i].typeId=='4'){
+				sContent = "<div>"
+				+ "<table><tr><th>监测点：</th><td>"+mapList[i].equipmentType+"</td></tr><tr>"
+				+ "<th>设备编号：</th><td>"+mapList[i].equipmentNO+"</td></tr>"
+				+ "<tr><th>数据状态：</th><td>"+mapList[i].errorFlagName+"</td></tr>"
+				+ "<tr><th>电池电压：</th><td>"+"10v"+"</td></tr></table>"
+				+ "<div  class='table-b' id='tableId-b'>"
+				+ "<table  border='0' cellspacing='0' cellpadding='0'>"
+				+ "<tr><td>温度：</td><td>"+data.temperature+"  摄氏度"+"</td></tr>"
+				+ "<tr><td>湿度：</td><td>"+data.humidity+"  %RH"+"</td></tr>"
+				+ "<tr><td>电导率：</td><td>"+data.conductivity+"  us/cm"+"</td></tr>"
+				+ "<tr><td>PH值：</td><td>"+data.ph+"</td></tr></table>" + "</div>"
+				+ "</div>"; 
+			}else{
+				sContent="设备暂无数据";
+			}
+			var points = new BMap.Point(x, y);//创建坐标点
+			var markers = new BMap.Marker(points, {
+				icon : icon
+			});
+			//创建弹框信息
+			var infoWindow = new BMap.InfoWindow(sContent);
+			map.addOverlay(markers);
+			//添加图标监听事件
+			addClickHandler(sContent,markers);
+		}
+	}
+	function addClickHandler(content,marker){
+		marker.addEventListener("click",function(e){
+			openInfo(content,e)}
+		);
+	}
+	function openInfo(content,e){
+		var p = e.target;
+		var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+		var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+		map.openInfoWindow(infoWindow,point); //开启信息窗口
+	}
+	
+</script>
+	
+</body>
+</html>

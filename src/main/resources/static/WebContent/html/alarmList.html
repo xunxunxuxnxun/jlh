@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>预警报警查询</title>
+		<link rel="stylesheet" type="text/css" href="../source/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../source/layui/css/layui.css" media="all" />
+		<script type="text/javascript" src="../source/jquery/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="../source/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="../source/layui/layui.js"></script>
+		<script src="../js/localPath.js"></script>
+		<style>
+			#listHeal {
+				background-color: #B0E0E6;
+			}
+			
+			#serchpanel {
+				background-color: #FAFAD2;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!--导航-->
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<!--小屏幕导航按钮和Logo-->
+				<div class="navbar-header">
+					<button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+					<a href="../index.html" class="navbar-brand">九里湖湿地生态环境监测平台</a>
+				</div>
+				<!--小屏幕导航按钮和Logo-->
+				<!--导航-->
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li class="active">
+							<a href="../html/detectionOnTime.html">
+								<span class="glyphicon"></span>&nbsp;&nbsp;实时监测
+							</a>
+						</li>
+						<li>
+							<a href="../html/warning.html#datatable">
+								<span class="glyphicon"></span>&nbsp;&nbsp;实时数据
+							</a>
+						</li>
+						<li>
+							<a href="../html/history.html#table">
+								<span class="glyphicon"></span>&nbsp;&nbsp;历史数据
+							</a>
+						</li>
+						<li>
+							<a href="../html/alarmList.html#alarmType">
+								<span class="glyphicon"></span>&nbsp;&nbsp;预警警报
+							</a>
+						</li>
+						<li>
+							<a href="../html/map.html#allmap">
+								<span class="glyphicon"></span>&nbsp;&nbsp;监测点
+							</a>
+						</li>
+						<li>
+                			<a href="../html/idi.html">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;动物识别
+                			</a>
+                		</li>
+                		<li>
+                			<a href="../html/zhiwu.html">
+                				<span class="glyphicon"></span>&nbsp;&nbsp;植物识别
+                			</a>
+                		</li>
+					</ul>
+
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown">
+							<a id="dLabel" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<!-- ${loginList.username } -->admin
+								<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="dLabel">
+								<li>
+									<a href="../index.html">
+										<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;前台首页
+									</a>
+								</li>
+								<li>
+									<a href="javascript:void(0);">
+										<span class="glyphicon glyphicon-screenshot"></span>&nbsp;&nbsp;用户注册
+									</a>
+								</li>
+							</ul>
+						</li>
+						<li>
+							<a href="../index.html"><span class="glyphicon glyphicon-off">
+		                		</span>&nbsp;&nbsp;退出
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<div>
+			<div>
+				<ol class="breadcrumb">
+					<li>
+						<a href="<%=path %>/back/index.jsp">主页</a>
+					</li>
+					<li class="active">预警报警</li>
+				</ol>
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="col-md-2">
+				<div class="" id="listHeal">
+					<div class="panel-body">
+						监测设备列表
+					</div>
+				</div>
+				<div class="list-group" id="leftList">
+
+				</div>
+			</div>
+			<div class="col-md-10">
+				<div class="" id="listHeal">
+					<div class="panel-body">
+						预警警报数据
+					</div>
+				</div>
+				<div class="" id="serchpanel">
+					<div class="panel-body">
+						开始时间：<input style="height:30px;" type="text" id="beginTime" readonly> 结束时间：
+						<input style="height:30px;" type="text" id="endTime" readonly>
+						<input id="alarmType" type="checkbox" value="1"> 报警
+						<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off" onclick="search()">
+						查询
+					</button>
+					</div>
+				</div>
+
+				<div class="col-md-12" style="border:1px solid #c4e3f3">
+					<div class="panel-body">
+						<table class="table table-bordered" id="datatable">
+							<thead>
+								<tr>
+									<td>设备编号</td>
+									<td>设备类型</td>
+									<td>数据项</td>
+									<td>报警时间</td>
+									<td>报警内容</td>
+								</tr>
+							</thead>
+							<tbody id="tbody">
+
+							</tbody>
+						</table>
+						<!-- 提示分页信息行 -->
+						<div class="row">
+							<!-- 分页文字信息 ：拿到控制器处理请求时封装在pageInfo里面的分页信息-->
+							<div class="col-sm-5" id="page_info_area">
+								<div class="dataTables_info" id="dataTableExample_info" style="margin-left: 20px">
+
+								</div>
+							</div>
+							<div class="col-sm-7">
+								<!-- 分页码 -->
+								<div class="dataTables_paginate paging_simple_numbers" id="dataTableExample_paginate" style="line-height: 32.4px">
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+
+<script type="text/javascript">
+	$("#beginTime").empty();
+	$("#endTime").empty();
+	layui.use('laydate', function(){
+		var laydate = layui.laydate;
+		//执行一个laydate实例
+		laydate.render({
+		elem: '#beginTime', //指定元素
+		format:'yyyy-MM-dd HH:mm:ss',
+		type: 'datetime'
+		});
+		//执行一个laydate实例
+		laydate.render({
+		elem: '#endTime', //指定元素
+		format:'yyyy-MM-dd HH:mm:ss',
+		type: 'datetime'
+		});
+	});
+	
+	var param = new Object();
+	param.id = 1;
+	var paramString = JSON.stringify(param);
+   //ajax请求后台
+  	$.ajax({
+	url:'/jlh/getEquipmentList',
+	type:'post',
+	dataType: 'json',
+	contentType: 'application/json', 
+	data:paramString,
+	success:function(data,status){
+		if(data.returnCode==200){
+			var obj = JSON.parse(data.returnObj);
+			displayList(obj);
+		}
+		if(data.returnCode==400){
+			alert("未查询到历史数据");
+		}
+	},
+	error: function(){  
+                 alert("服务器没有返回数据，可能服务器忙，请重试");  
+             }
+	});
+   //查询报警信息
+   function search(){
+	   var param = new Object();
+		param.pageNum = 1;
+		param.beginTime = $("#beginTime").val();
+		param.endTime = $("#endTime").val();
+		param.equipmentType = equipmentType;
+		param.equipmentNumber = equipmentNumber;
+		var flag = $("input[type='checkbox']").is(':checked');
+		if(flag){
+			param.alarmType="1";
+		}else{
+			param.alarmType="";
+		}
+		var paramString = JSON.stringify(param);
+	   //ajax请求后台
+	  	$.ajax({
+		url:'/jlh/getEquipmentAlarm',
+		type:'post',
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:paramString,
+		success:function(data,status){
+			debugger;
+			if(data.returnCode==200){
+				var obj = JSON.parse(data.returnObj);
+				display(obj);
+				build_pagination_info(obj);
+				build_pagination_nav(obj);
+			}
+			if(data.returnCode==400){
+				alert("未查询到历史数据");
+			}
+		},
+		error: function(){  
+	                 alert("服务器没有返回数据，可能服务器忙，请重试");  
+	             }
+		});
+   }
+   
+   
+   var equipmentNumber = "";
+   var equipmentType = "";
+	//查询报警信息
+	function getAlarm(id){
+		debugger;
+		var strs= new Array();
+		strs=id.split("-");
+		equipmentNumber=strs[0];
+		equipmentType=strs[1];
+		var param = new Object();
+		param.pageNum = 1;
+		param.beginTime = $("#beginTime").val();
+		param.endTime = $("#endTime").val();
+		param.equipmentType = equipmentType;
+		param.equipmentNumber = equipmentNumber;
+		var flag = $("input[type='checkbox']").is(':checked');
+		if(flag){
+			param.alarmType="1";
+		}else{
+			param.alarmType="";
+		}
+		/* param.alarmType = $("#alarmType").val(); */
+		var paramString = JSON.stringify(param);
+	   //ajax请求后台
+	  	$.ajax({
+		url:'/jlh/getEquipmentAlarm',
+		type:'post',
+		dataType: 'json',
+		contentType: 'application/json', 
+		data:paramString,
+		success:function(data,status){
+			debugger;
+			if(data.returnCode==200){
+				var obj = JSON.parse(data.returnObj);
+				display(obj);
+				build_pagination_info(obj);
+				build_pagination_nav(obj);
+			}
+			if(data.returnCode==400){
+				alert("未查询到历史数据");
+			}
+		},
+		error: function(){  
+	                 alert("服务器没有返回数据，可能服务器忙，请重试");  
+	             }
+	});
+	}
+	//ajax请求后台
+   function ajaxPost(param){
+	  	$.ajax({
+			url:'/jlh/getEquipmentAlarm',
+			type : 'post',
+			dataType : 'json',
+			contentType : 'application/json',
+			data : param,
+			success : function(data, status) {
+				if (data.returnCode == 200) {
+					var obj = JSON.parse(data.returnObj);
+					display(obj);
+					build_pagination_info(obj);
+					build_pagination_nav(obj);
+				}
+				if (data.returnCode == 400) {
+					alert("未查询到历史数据");
+				}
+			},
+			error : function() {
+				alert("服务器没有返回数据，可能服务器忙，请重试");
+			}
+		});
+	}
+
+	//数据展示
+	function display(data) {
+		$("#tbody").empty();
+		var list = data.list;
+		var tbody = document.getElementById("tbody");
+		for (var i = 0; i < list.length; i++) {
+			var tr = "<tr>" + "<td>" + list[i].equipmentNumber + "</td>" + "<td>"
+					+ list[i].equipmentType + "</td>" + "<td>" + list[i].property
+					+ "</td>" + "<td>"
+					+ list[i].alarmTime + "</td>" + "<td>" + list[i].content
+					+ "</td>" + "</tr>";
+			$("#tbody").append(tr);
+		}
+	}
+	//展示左侧列表
+	   function displayList(data){
+		   $("#leftList").empty();
+			for (var i = 0; i < data.length; i++) {
+				var button = "<button id='"+data[i].equipmentNO+"-"+data[i].typeId+"'type='button' class='list-group-item'" +
+				"onclick='getAlarm(this.id)'>"+
+				"<p class='list-group-item-text' >站点编号："+data[i].siteNO+"</p>"+
+				"<p class='list-group-item-text'>设备编号："+data[i].equipmentNO+"</p>"+
+				"<p class='list-group-item-text'>设备类型："+data[i].equipmentType+"</p>"+
+			  	"</button>";
+				$("#leftList").append(button);
+			}
+	   }
+	  
+	/**
+	    创建分页信息
+	 */
+	function build_pagination_info(result) {
+		$("#dataTableExample_info").empty();
+
+		//得到服务器返回的jason数据里的分页信息，然后拼接
+
+		var pageNum = result.pageNum;
+		var pageSize = result.pages;
+		var total = result.total;
+
+		//"当前"+pageNum+"页,共"+pages+"页,总"+total+"条记录"
+		// $("#dataTableExample_info").append("第"+ pageNum+ "至"+ pageSize+" 项，共"+ total+" 项");
+		$("#dataTableExample_info").append(
+				"当前" + pageNum + "页,共" + pageSize + "页,总" + total + "条记录")
+	}
+
+	/**
+	 创建分页导航条：
+	 根据bootstrap文档里的分页说明，使用jquery创建元素。
+	 */
+	function build_pagination_nav(result) {
+		$("#dataTableExample_paginate").empty();
+		//首页
+		var fristPageLi = $("<li></li>").append(
+				$("<a></a>").attr("href", "javacript:void(0);").append("首页"));
+		//前一页
+		var prePageLi = $("<li></li>").append(
+				$("<a></a>").attr("href", "javacript:void(0);").append(
+						$("<span></span>").append("&laquo;")));
+		//如果没有前一页，就让按钮不能被点击,否则绑定点击事件，重新发送ajax请求，访问相应页面
+		if (result.hasPreviousPage == false) {
+			fristPageLi.addClass("disable");
+			prePageLi.addClass("disable");
+		} else {
+			fristPageLi.click(function() {
+				var param = new Object();
+				param.pageNum = 1;
+				param.beginTime = $("#beginTime").val();
+				param.endTime = $("#endTime").val();
+				param.equipmentType = equipmentType;
+				param.equipmentNumber = equipmentNumber;
+				var flag = $("input[type='checkbox']").is(':checked');
+				if(flag){
+					param.alarmType="1";
+				}else{
+					param.alarmType="";
+				}
+				var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+			});
+			prePageLi.click(function() {
+				var param = new Object();
+				param.pageNum = result.pageNum - 1;
+				param.beginTime = $("#beginTime").val();
+				param.endTime = $("#endTime").val();
+				param.equipmentType = equipmentType;
+				param.equipmentNumber = equipmentNumber;
+				var flag = $("input[type='checkbox']").is(':checked');
+				if(flag){
+					param.alarmType="1";
+				}else{
+					param.alarmType="";
+				}
+				
+				var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+			});
+		}
+		var ul = $("<ul class=\"pagination\" style=\"float: right\"></ul>")
+				.addClass("pagination").append(fristPageLi).append(prePageLi);
+		$.each(result.navigatepageNums, function(index, element) {
+			var numLi = $("<li></li>").append(
+					$("<a></a>").attr("href", "javacript:void(0);").append(
+							element));
+			//如果遍历的页码等于当前页面，就高亮显示，然后添加点击事件，如果有点击，就重新发送ajax请求，访问当前页面（pn=element）
+			if (result.pageNum == element) {
+				numLi.addClass("active");
+			}
+			numLi.click(function() {
+				var param = new Object();
+				param.pageNum = element;
+				param.beginTime = $("#beginTime").val();
+				param.endTime = $("#endTime").val();
+				param.equipmentType = equipmentType;
+				param.equipmentNumber = equipmentNumber;
+				var flag = $("input[type='checkbox']").is(':checked');
+				if(flag){
+					param.alarmType="1";
+				}else{
+					param.alarmType="";
+				}
+				var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+			})
+			ul.append(numLi);
+		})
+		//下一页
+		var nextPageLi = $("<li></li>").append(
+				$("<a></a>").attr("href", "javacript:void(0);").append(
+						$("<span></span>").append("&raquo;")));
+		//末页
+		var lastPageLi = $("<li></li>").append(
+				$("<a></a>").attr("href", "javacript:void(0);").append("末页"));
+		//如果没有后一页，就让按钮不能被点击,否则绑定点击事件，重新发送ajax请求，访问相应页面
+		if (result.hasNextPage == false) {
+			nextPageLi.addClass("disable");
+			lastPageLi.addClass("disable");
+		} else {
+			nextPageLi.click(function() {
+				var param = new Object();
+				param.pageNum = result.pageNum + 1;
+				param.beginTime = $("#beginTime").val();
+				param.endTime = $("#endTime").val();
+				param.equipmentType = equipmentType;
+				param.equipmentNumber = equipmentNumber;
+				var flag = $("input[type='checkbox']").is(':checked');
+				if(flag){
+					param.alarmType="1";
+				}else{
+					param.alarmType="";
+				}
+				var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+			});
+			lastPageLi.click(function() {
+				var param = new Object();
+				param.pageNum = result.pages;
+				param.beginTime = $("#beginTime").val();
+				param.endTime = $("#endTime").val();
+				param.equipmentType = equipmentType;
+				param.equipmentNumber = equipmentNumber;
+				var flag = $("input[type='checkbox']").is(':checked');
+				if(flag){
+					param.alarmType="1";
+				}else{
+					param.alarmType="";
+				}
+				var paramString = JSON.stringify(param);//将入参json对象转换成json字符串形式
+				ajaxPost(paramString);
+			});
+		}
+		ul.append(nextPageLi).append(lastPageLi);
+		$("<nav></nav>").append(ul).appendTo("#dataTableExample_paginate");
+	}
+</script>
